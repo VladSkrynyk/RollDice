@@ -1,45 +1,36 @@
 package com.example.rolldice
 
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.util.Log
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Observer
 import com.example.rolldice.databinding.ActivityMainBinding
+import com.example.rolldice.viewmodel.DiceViewModel
 
 class MainActivity : AppCompatActivity() {
 
+    private val viewModel: DiceViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
-    val viewModel by viewModels<MyViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
-
         setContentView(binding.root)
-        
-        binding.buttonStart.setOnClickListener{
-            Log.d(TAG, "onCreate: Timer starts ")
-            startTimer( 20_000, 1_000)
-            
-        }
 
-        viewModel.timerLiveData.observe(this) { currentTime: Long ->
-            binding.textViewTime.text = (currentTime / 1000).toInt().toString()
+        viewModel.diceSides.observe(this, Observer { diceModel ->
+            diceModel.sides.forEachIndexed { index, side ->
+                val resId = resources.getIdentifier("dice_$side", "drawable", packageName)
+                when (index) {
+                    0 -> binding.dice1.setImageResource(resId)
+                    1 -> binding.dice2.setImageResource(resId)
+                    2 -> binding.dice3.setImageResource(resId)
+                    3 -> binding.dice4.setImageResource(resId)
+                    4 -> binding.dice5.setImageResource(resId)
+                }
+            }
+        })
 
-        }
-    }
-
-    private fun startTimer(start: Long, step: Long) {
-        viewModel.startTimer(20_000, 1_000)
-    }
-    
-    companion object {
-        val TAG = "XXXX"
+        binding.startButton.setOnClickListener { viewModel.startRolling() }
+        binding.stopButton.setOnClickListener { viewModel.stopRolling() }
     }
 }

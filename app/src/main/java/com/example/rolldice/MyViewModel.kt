@@ -1,35 +1,35 @@
-package com.example.rolldice
+// DiceViewModel.kt
+package com.example.rolldice.viewmodel
 
-import android.os.CountDownTimer
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.rolldice.MainActivity.Companion.TAG
+import com.example.rolldice.model.DiceModel
+import kotlinx.coroutines.*
 
-class MyViewModel : ViewModel() {
-    val _timerLiveData : MutableLiveData<Long> = MutableLiveData(0)
-    val timerLiveData: LiveData<Long>
-        get() = _timerLiveData
+class DiceViewModel : ViewModel() {
 
-    fun startTimer(start: Long, step: Long) {
-        object : CountDownTimer(start, step) {
+    private val _diceSides = MutableLiveData<DiceModel>()
+    val diceSides: LiveData<DiceModel> get() = _diceSides
 
-            override fun onTick(millisUntilFinished: Long) {
-                // binding.textViewTime.text = (millisUntilFinished / 1000).toInt().toString()
-                //activity.binding.textViewTime.text = (millisUntilFinished / 1000).toInt().toString()
+    private var rollingJob: Job? = null
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-                _timerLiveData.value = millisUntilFinished
-                Log.d(TAG, "onTick: $millisUntilFinished")
+    fun startRolling() {
+        rollingJob = coroutineScope.launch {
+            while (isActive) {
+                _diceSides.value = DiceModel()
+                delay(200L)
             }
+        }
+    }
 
-            override fun onFinish() {
-                // binding.textViewTime.text = "Time is over"
-                //activity.binding.textViewTime.text = "Time is over"
+    fun stopRolling() {
+        rollingJob?.cancel()
+    }
 
-                Log.d(TAG, "onFinish: timer is over")
-            }
-        }.start()
-
+    override fun onCleared() {
+        super.onCleared()
+        coroutineScope.cancel()
     }
 }
