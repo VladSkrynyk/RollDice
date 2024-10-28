@@ -8,6 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // test message vladskr
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
