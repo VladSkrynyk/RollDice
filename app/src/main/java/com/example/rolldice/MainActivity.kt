@@ -1,6 +1,7 @@
 package com.example.rolldice
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -8,6 +9,15 @@ import com.example.rolldice.databinding.ActivityMainBinding
 import com.example.rolldice.viewmodel.DiceViewModel
 
 class MainActivity : AppCompatActivity() {
+
+    private val diceResources = intArrayOf(
+        R.drawable.dice_1,
+        R.drawable.dice_2,
+        R.drawable.dice_3,
+        R.drawable.dice_4,
+        R.drawable.dice_5,
+        R.drawable.dice_6
+    )
 
     private val viewModel: DiceViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
@@ -18,8 +28,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         viewModel.diceSides.observe(this, Observer { diceModel ->
+            // Log.d("XXX", "onCreate: ${diceModel.toString()}") - debug
+
             diceModel.sides.forEachIndexed { index, side ->
-                val resId = resources.getIdentifier("dice_$side", "drawable", packageName)
+                // val resId = resources.getIdentifier("dice_$side", "drawable", packageName)
+
+                // Log.d("XXX", "onCreate: $side") - debug
+                val resId = diceResources[side - 1]
+
                 when (index) {
                     0 -> binding.dice1.setImageResource(resId)
                     1 -> binding.dice2.setImageResource(resId)
@@ -30,8 +46,16 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // disable unable logic
+        viewModel.isActiveRoll.observe(this) { isActive ->
+            binding.startButton.isEnabled = isActive
+        }
+        viewModel.isActiveStop.observe(this) { isActive ->
+            binding.stopButton.isEnabled = isActive
+        }
+
         binding.startButton.setOnClickListener { viewModel.startRolling() }
         binding.stopButton.setOnClickListener { viewModel.stopRolling() }
     }
-    //global changes
+
 }
