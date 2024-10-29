@@ -33,4 +33,5 @@ class MainActivity : AppCompatActivity() {
         binding.startButton.setOnClickListener { viewModel.startRolling() }
         binding.stopButton.setOnClickListener { viewModel.stopRolling() }
     }
+    //global changes
 }
